@@ -14,5 +14,5 @@ public interface UserService {
     Optional<User> findUserById(Long id);
     Optional<User> findUserByEmail(String email);
     Role findRoleUserByEmail(String email);
-    User updateUser(UserDTO userDTO);
+    User updateUser(UserDTO userDTO, User existingUser);
 }

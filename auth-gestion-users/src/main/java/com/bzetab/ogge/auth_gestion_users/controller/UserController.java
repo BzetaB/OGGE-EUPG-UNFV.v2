@@ -4,7 +4,7 @@ import com.bzetab.ogge.auth_gestion_users.model.dto.UserDTO;
 import com.bzetab.ogge.auth_gestion_users.model.entities.User;
 import com.bzetab.ogge.auth_gestion_users.model.enums.Role;
 import com.bzetab.ogge.auth_gestion_users.model.request.UserRegisterRequest;
-import com.bzetab.ogge.auth_gestion_users.service.imp.UserServiceImp;
+import com.bzetab.ogge.auth_gestion_users.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,9 +14,9 @@ import java.util.List;
 @RequestMapping("/ogge-eupg-unfv/gestion-usuarios/usuario")
 public class UserController {
 
-    private final UserServiceImp userService;
+    private final UserService userService;
 
-    public UserController(UserServiceImp userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -36,8 +36,8 @@ public class UserController {
     }
 
     @PutMapping("/actualizar-usuario/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.updateUser(userDTO));
+    public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody UserDTO userDTO, User existingUser) {
+        return ResponseEntity.ok(userService.updateUser(userDTO, existingUser));
     }
 
 

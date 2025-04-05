@@ -32,7 +32,7 @@ public class UserServiceImp implements UserService {
                 .emailUser(userRegisterRequest.getEmail())
                 .passwordUser(userRegisterRequest.getPassword())
                 .statusUser(true)
-                .role(userRegisterRequest.getRole())
+                .role(Role.EGRESADO)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -64,20 +64,21 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public User updateUser(UserDTO userDTO) {
-        User updateUser = this.findUserById(userDTO.getId())
+    public User updateUser(UserDTO userDTO, User existingUser) {
+        User updateUser = existingUser != null ? existingUser :
+                this.findUserById(userDTO.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (userDTO.getPasswordUser() != null) {
             updateUser.setPasswordUser(userDTO.getPasswordUser());
         }
-        if (userDTO.getEmailUser() != null) {
+        if (userDTO.getEmailUser() != null && userDTO.getEmailUser().equals(updateUser.getEmailUser())) {
+            if (userRepository.findUserByEmailUser(updateUser.getEmailUser()).isPresent()) {
+                throw new RuntimeException("Email already exists");
+            }
             updateUser.setEmailUser(userDTO.getEmailUser());
         }
 
-        if (userDTO.getRole() != null) {
-            updateUser.setRole(userDTO.getRole());
-        }
         if (userDTO.getStatusUser() != null) {
             updateUser.setStatusUser(userDTO.getStatusUser());
         }

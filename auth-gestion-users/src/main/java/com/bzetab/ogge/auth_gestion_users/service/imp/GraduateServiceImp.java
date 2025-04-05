@@ -7,7 +7,6 @@ import com.bzetab.ogge.auth_gestion_users.model.entities.User;
 import com.bzetab.ogge.auth_gestion_users.model.enums.Role;
 import com.bzetab.ogge.auth_gestion_users.model.request.UserRegisterRequest;
 import com.bzetab.ogge.auth_gestion_users.repository.GraduateRepository;
-import com.bzetab.ogge.auth_gestion_users.repository.UserRepository;
 import com.bzetab.ogge.auth_gestion_users.service.GraduateService;
 import com.bzetab.ogge.auth_gestion_users.service.UserService;
 import org.springframework.stereotype.Service;
@@ -40,6 +39,7 @@ public class GraduateServiceImp  implements GraduateService {
         }
 
         User userGraduate = userService.createUser(userRegisterRequest);
+        userGraduate.setRole(Role.EGRESADO);
 
         Graduate graduate = Graduate.builder()
                 .nameGraduate(userRegisterRequest.getName())
@@ -68,6 +68,7 @@ public class GraduateServiceImp  implements GraduateService {
                 .orElseThrow(() -> new RuntimeException("Graduate not found"));
 
         User user = updateGraduate.getUser();
+
 
         if(userDTO != null) {
             if(!updateGraduate.getUser().getIdUser().equals(userDTO.getId())){

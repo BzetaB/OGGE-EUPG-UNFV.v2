@@ -2,7 +2,6 @@ package com.bzetab.ogge.auth_gestion_users.model.entities;
 
 import com.bzetab.ogge.auth_gestion_users.model.enums.Role;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -39,4 +38,8 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference("graduate_user")
     private Graduate graduate;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference("employee_user")
+    private Employee employee;
 }

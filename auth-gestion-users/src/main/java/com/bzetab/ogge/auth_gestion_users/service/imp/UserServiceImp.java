@@ -32,7 +32,7 @@ public class UserServiceImp implements UserService {
                 .emailUser(userRegisterRequest.getEmail())
                 .passwordUser(userRegisterRequest.getPassword())
                 .statusUser(true)
-                .role(Role.EGRESADO)
+                .role(Role.ADMIN)
                 .createdAt(LocalDateTime.now())
                 .build();
 

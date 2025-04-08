@@ -1,88 +1,72 @@
 package com.bzetab.ogge.auth_gestion_users.service.imp;
 
-import com.bzetab.ogge.auth_gestion_users.model.dto.UserDTO;
-import com.bzetab.ogge.auth_gestion_users.model.entities.User;
-import com.bzetab.ogge.auth_gestion_users.model.enums.Role;
-import com.bzetab.ogge.auth_gestion_users.model.request.UserRegisterRequest;
+import com.bzetab.ogge.auth_gestion_users.model.entities.Role;
+import com.bzetab.ogge.auth_gestion_users.model.entities.UserRole;
+import com.bzetab.ogge.auth_gestion_users.model.entities.Users;
+import com.bzetab.ogge.auth_gestion_users.repository.RoleRepository;
 import com.bzetab.ogge.auth_gestion_users.repository.UserRepository;
 import com.bzetab.ogge.auth_gestion_users.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserServiceImp implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
 
-    public UserServiceImp(UserRepository userRepository) {
+    public UserServiceImp(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
     @Override
-    public User createUser(UserRegisterRequest userRegisterRequest) {
-
-        if (this.findUserByEmail(userRegisterRequest.getEmail()).isPresent()) {
+    public Users createUser(String email, String password, List<String> roles) {
+        if (userRepository.findUserByEmailUser(email).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
+        if(password.isEmpty()){
+            throw new RuntimeException("Password is empty");
+        }
+        if(roles.isEmpty()){
+            throw new RuntimeException("Roles is empty");
+        }
+        List<Role> rolesFound = roleRepository.findByNameRolIn(roles);
+        if(rolesFound.isEmpty()){
+            throw new RuntimeException("Roles not found");
+        }
 
-        User registerUser = User.builder()
-                .emailUser(userRegisterRequest.getEmail())
-                .passwordUser(userRegisterRequest.getPassword())
+        String encondedPassword = passwordEncoder.encode(password);
+
+        Users newUser = Users.builder()
+                .emailUser(email)
+                .passwordUser(encondedPassword)
                 .statusUser(true)
-                .role(Role.ADMIN)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return userRepository.save(registerUser);
+        Set<UserRole> rolesUser = new HashSet<>();
+        for(Role role : rolesFound){
+            UserRole userRole = UserRole.builder()
+                    .role(role)
+                    .users(newUser)
+                    .active(true)
+                    .build();
+            rolesUser.add(userRole);
+        }
+        newUser.setRole(rolesUser);
+        return userRepository.save(newUser);
     }
 
     @Override
-    public List<User> getUsers() {
+    public List<Users> getUsers() {
         return userRepository.findAll();
-    }
-
-    @Override
-    public Optional<User> findUserById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    @Override
-    public Optional<User> findUserByEmail(String email) {
-        return userRepository.findUserByEmailUser(email);
-    }
-
-    @Override
-    public Role findRoleUserByEmail(String email) {
-
-        User userFound = this.findUserByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return userFound.getRole();
-    }
-
-    @Override
-    public User updateUser(UserDTO userDTO, User existingUser) {
-        User updateUser = existingUser != null ? existingUser :
-                this.findUserById(userDTO.getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (userDTO.getPasswordUser() != null) {
-            updateUser.setPasswordUser(userDTO.getPasswordUser());
-        }
-        if (userDTO.getEmailUser() != null && userDTO.getEmailUser().equals(updateUser.getEmailUser())) {
-            if (userRepository.findUserByEmailUser(updateUser.getEmailUser()).isPresent()) {
-                throw new RuntimeException("Email already exists");
-            }
-            updateUser.setEmailUser(userDTO.getEmailUser());
-        }
-
-        if (userDTO.getStatusUser() != null) {
-            updateUser.setStatusUser(userDTO.getStatusUser());
-        }
-
-        return userRepository.save(updateUser);
     }
 }

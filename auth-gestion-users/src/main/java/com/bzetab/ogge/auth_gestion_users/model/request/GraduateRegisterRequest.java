@@ -1,19 +1,16 @@
-package com.bzetab.ogge.auth_gestion_users.model.dto;
+package com.bzetab.ogge.auth_gestion_users.model.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GraduateDTO {
+public class GraduateRegisterRequest extends  RegisterRequest{
     private String nameGraduate;
     private String lastNameGraduate;
-    private String emailGraduate;
-    private String typeDocument;
+    private String documentType;
     private String documentNumber;
     private String cellphone;
     private String currentDegree;

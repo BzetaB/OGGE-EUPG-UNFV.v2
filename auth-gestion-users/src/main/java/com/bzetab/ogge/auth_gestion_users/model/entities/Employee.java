@@ -48,5 +48,5 @@ public class Employee {
     @OneToOne
     @JoinColumn(name = "id_user", unique = true, nullable = false)
     @JsonManagedReference("employee_user")
-    private User user;
+    private Users user;
 }

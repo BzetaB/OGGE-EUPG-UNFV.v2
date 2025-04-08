@@ -5,6 +5,7 @@ import com.bzetab.ogge.auth_gestion_users.model.enums.DocumentType;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -32,6 +33,7 @@ public class Graduate {
 
     private Boolean activeGraduate;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
@@ -50,6 +52,6 @@ public class Graduate {
     @OneToOne
     @JoinColumn(name = "id_user", unique = true, nullable = false)
     @JsonManagedReference("graduate_user")
-    private User user;
+    private Users user;
 
 }

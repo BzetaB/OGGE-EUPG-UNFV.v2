@@ -1,8 +1,6 @@
 package com.bzetab.ogge.auth_gestion_users.controller;
 
 import com.bzetab.ogge.auth_gestion_users.model.entities.Graduate;
-import com.bzetab.ogge.auth_gestion_users.model.request.UpdateGraduateRequest;
-import com.bzetab.ogge.auth_gestion_users.model.request.UserRegisterRequest;
 import com.bzetab.ogge.auth_gestion_users.service.GraduateService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,13 +41,4 @@ public class GraduateControlller {
         return ResponseEntity.ok(graduateService.getGraduates());
     }
 
-    @PostMapping("/registrar")
-    public ResponseEntity<Graduate> createGraduate(@RequestBody UserRegisterRequest userRegisterRequest) {
-        return ResponseEntity.ok(graduateService.createGraduate(userRegisterRequest));
-    }
-
-    @PutMapping("/actualizar/{id}")
-    public ResponseEntity<Graduate> updateGraduate(@PathVariable("id") Long Id, @RequestBody UpdateGraduateRequest updateRequest) {
-        return ResponseEntity.ok(graduateService.updateGraduate(updateRequest.getGraduateDTO(), updateRequest.getUserDTO()));
-    }
 }

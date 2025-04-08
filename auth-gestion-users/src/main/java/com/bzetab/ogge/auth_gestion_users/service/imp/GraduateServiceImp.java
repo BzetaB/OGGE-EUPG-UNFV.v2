@@ -1,18 +1,18 @@
 package com.bzetab.ogge.auth_gestion_users.service.imp;
 
 import com.bzetab.ogge.auth_gestion_users.model.dto.GraduateDTO;
-import com.bzetab.ogge.auth_gestion_users.model.dto.UserDTO;
 import com.bzetab.ogge.auth_gestion_users.model.entities.Graduate;
-import com.bzetab.ogge.auth_gestion_users.model.entities.User;
-import com.bzetab.ogge.auth_gestion_users.model.enums.Role;
-import com.bzetab.ogge.auth_gestion_users.model.request.UserRegisterRequest;
+import com.bzetab.ogge.auth_gestion_users.model.entities.Users;
+import com.bzetab.ogge.auth_gestion_users.model.enums.Degree;
+import com.bzetab.ogge.auth_gestion_users.model.enums.DocumentType;
+import com.bzetab.ogge.auth_gestion_users.model.request.GraduateRegisterRequest;
 import com.bzetab.ogge.auth_gestion_users.repository.GraduateRepository;
 import com.bzetab.ogge.auth_gestion_users.service.GraduateService;
 import com.bzetab.ogge.auth_gestion_users.service.UserService;
+import com.bzetab.ogge.auth_gestion_users.utils.GeneralResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,91 +26,62 @@ public class GraduateServiceImp  implements GraduateService {
         this.graduateRepository = graduateRepository;
         this.userService = userService;
     }
-    @Transactional()
+
+    @Transactional
     @Override
-    public Graduate createGraduate(UserRegisterRequest userRegisterRequest) {
-
-        if (graduateRepository.findGraduateByCellphoneGraduate(userRegisterRequest.getCellphone()).isPresent()) {
-            throw new RuntimeException("Graduate Cellphone already exists");
+    public Graduate createEgresado(GraduateRegisterRequest request) {
+        if(request.getDocumentNumber().isEmpty()){
+            throw new RuntimeException("El documento no puede estar vacio");
         }
-
-        if(graduateRepository.findGraduateByDocumentNumberGraduate(userRegisterRequest.getDocumentNumber()).isPresent()) {
-            throw new RuntimeException("Graduate Document number already exists");
+        if(graduateRepository.findGraduateByDocumentNumberGraduate(request.getDocumentNumber()).isPresent()){
+            throw new RuntimeException("El documento ya existe");
         }
-
-        User userGraduate = userService.createUser(userRegisterRequest);
-        userGraduate.setRole(Role.EGRESADO);
+        if(request.getCellphone().isEmpty()){
+            throw new RuntimeException("El cellphone no puede estar vacio");
+        }
+        if(graduateRepository.findGraduateByCellphoneGraduate(request.getCellphone()).isPresent()){
+            throw new RuntimeException("El cellphone ya existe");
+        }
+        List<String> rol = List.of("EGRESADO");
+        Users user = userService.createUser(request.getEmail(), request.getPassword(), rol);
 
         Graduate graduate = Graduate.builder()
-                .nameGraduate(userRegisterRequest.getName())
-                .lastNameGraduate(userRegisterRequest.getLastName())
-                .documentType(userRegisterRequest.getDocumentType())
-                .documentNumberGraduate(userRegisterRequest.getDocumentNumber())
-                .cellphoneGraduate(userRegisterRequest.getCellphone())
+                .nameGraduate(request.getNameGraduate())
+                .lastNameGraduate(request.getLastNameGraduate())
+                .documentType(DocumentType.valueOf(request.getDocumentType()))
+                .documentNumberGraduate(request.getDocumentNumber())
+                .cellphoneGraduate(request.getCellphone())
                 .activeGraduate(true)
-                .createdAt(LocalDateTime.now())
-                .currentDegree(userRegisterRequest.getCurrentDegree())
-                .aspireDegree(userRegisterRequest.getAspireDegree())
-                .user(userGraduate)
+                .currentDegree(Degree.valueOf(request.getCurrentDegree()))
+                .aspireDegree(Degree.valueOf(request.getAspireDegree()))
+                .user(user)
                 .build();
         return graduateRepository.save(graduate);
     }
+
+    @Override
+    public GeneralResponse generateGraduateDTO(Graduate graduate) {
+        return GeneralResponse.builder()
+                .message("Egresado registrado exitosamente")
+                .data(GraduateDTO.builder()
+                        .nameGraduate(graduate.getNameGraduate())
+                        .lastNameGraduate(graduate.getLastNameGraduate())
+                        .emailGraduate(graduate.getUser().getEmailUser())
+                        .typeDocument(graduate.getDocumentType().name())
+                        .documentNumber(graduate.getDocumentNumberGraduate())
+                        .cellphone(graduate.getCellphoneGraduate())
+                        .currentDegree(graduate.getCurrentDegree().name())
+                        .aspireDegree(graduate.getAspireDegree().name())
+                        .build())
+                .build();
+    }
+
 
     @Override
     public List<Graduate> getGraduates() {
         return graduateRepository.findAll();
     }
 
-    @Transactional()
-    @Override
-    public Graduate updateGraduate(GraduateDTO graduateDTO, UserDTO userDTO) {
-        Graduate updateGraduate = graduateRepository.findById(graduateDTO.getIdGraduate())
-                .orElseThrow(() -> new RuntimeException("Graduate not found"));
-
-        User user = updateGraduate.getUser();
-
-
-        if(userDTO != null) {
-            if(!updateGraduate.getUser().getIdUser().equals(userDTO.getId())){
-                throw new RuntimeException("Graduate user id does not match");
-            }
-            userService.updateUser(userDTO, user);
-        }
-
-        if(graduateDTO.getName() != null) {
-            updateGraduate.setNameGraduate(graduateDTO.getName());
-        }
-        if(graduateDTO.getLastName() != null) {
-            updateGraduate.setLastNameGraduate(graduateDTO.getLastName());
-        }
-        if(graduateDTO.getDocumentType() != null) {
-            updateGraduate.setDocumentType(graduateDTO.getDocumentType());
-        }
-        if(graduateDTO.getDocumentNumber() != null && !graduateDTO.getDocumentNumber().equals(updateGraduate.getDocumentNumberGraduate())) {
-            if(this.findGraduateByDocumentNumberGraduate(graduateDTO.getDocumentNumber()).isPresent()) {
-                throw new RuntimeException("Graduate Document number already exists");
-            }
-            updateGraduate.setDocumentNumberGraduate(graduateDTO.getDocumentNumber());
-
-        }
-        if(graduateDTO.getCellphone() != null && !graduateDTO.getCellphone().equals(updateGraduate.getCellphoneGraduate())) {
-            if(graduateRepository.findGraduateByCellphoneGraduate(graduateDTO.getCellphone()).isPresent()) {
-                throw new RuntimeException("Graduate Cellphone already exists");
-            }
-            updateGraduate.setCellphoneGraduate(graduateDTO.getCellphone());
-        }
-        if (graduateDTO.getActive() != null) {
-            updateGraduate.setActiveGraduate(graduateDTO.getActive());
-        }
-        if (graduateDTO.getCurrentDegree() != null) {
-            updateGraduate.setCurrentDegree(graduateDTO.getCurrentDegree());
-        }
-        if (graduateDTO.getAspiredDegree() != null) {
-            updateGraduate.setAspireDegree(graduateDTO.getAspiredDegree());
-        }
-
-        return graduateRepository.save(updateGraduate);
-    }
 
     @Override
     public Optional<Graduate> findGraduateById(Long id) {

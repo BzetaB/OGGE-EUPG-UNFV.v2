@@ -1,12 +1,14 @@
 package com.bzetab.ogge.auth_gestion_users.model.entities;
 
-import com.bzetab.ogge.auth_gestion_users.model.enums.Role;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,7 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "User")
-public class User {
+public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,9 +27,6 @@ public class User {
     private String emailUser;
     private String passwordUser;
     private Boolean statusUser;
-
-    @Enumerated(EnumType.STRING)
-    private Role role;
 
     private LocalDateTime createdAt;
 
@@ -42,4 +41,8 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonBackReference("employee_user")
     private Employee employee;
+
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("user_role")
+    private Set<UserRole> role = new HashSet<>();
 }

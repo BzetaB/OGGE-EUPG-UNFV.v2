@@ -1,8 +1,6 @@
 package com.bzetab.ogge.auth_gestion_users.controller;
 
 import com.bzetab.ogge.auth_gestion_users.model.entities.Employee;
-import com.bzetab.ogge.auth_gestion_users.model.request.UpdateEmployeeRequest;
-import com.bzetab.ogge.auth_gestion_users.model.request.UserRegisterRequest;
 import com.bzetab.ogge.auth_gestion_users.service.EmployeeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,15 +39,4 @@ public class EmployeeController {
     public ResponseEntity<List<Employee>> getAllEmployees() {
         return ResponseEntity.ok(employeeService.getEmployees());
     }
-
-    @PostMapping("/registrar")
-    public ResponseEntity<Employee> createEmployee(@RequestBody UserRegisterRequest userRegisterRequest) {
-        return ResponseEntity.ok(employeeService.createEmployee(userRegisterRequest));
-    }
-
-    @PutMapping("/actualizar/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable("id") Long Id, @RequestBody UpdateEmployeeRequest updateRequest) {
-        return ResponseEntity.ok(employeeService.updateEmployee(updateRequest.getEmployeeDTO(), updateRequest.getUserDTO()));
-    }
-
 }

@@ -1,21 +1,20 @@
 package com.bzetab.ogge.auth_gestion_users.model.dto;
 
-import com.bzetab.ogge.auth_gestion_users.model.enums.DocumentType;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
-@Builder
-public class EmployeeDTO {
-    private Long idEmployee;
-    private String name;
-    private String lastName;
-    private DocumentType documentType;
-    private String documentNumber;
-    private String cellphone;
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+public class EmployeeDTO extends UserDTO{
     private Boolean active;
     private LocalDateTime dateAdmission;
     private LocalDateTime dateDeparture;
+    private LocalDateTime dateCreated;
+    private List<String> roles;
 }

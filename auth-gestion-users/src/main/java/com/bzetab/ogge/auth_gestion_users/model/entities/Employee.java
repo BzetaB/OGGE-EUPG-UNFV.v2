@@ -4,6 +4,7 @@ import com.bzetab.ogge.auth_gestion_users.model.enums.DocumentType;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -38,6 +39,7 @@ public class Employee {
 
     private LocalDateTime departureEmployee;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp

@@ -10,6 +10,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterRequest {
+    private String name;
+    private String lastName;
+    private String documentType;
+    private String documentNumber;
+    private String cellphone;
     private String email;
     private String password;
     private List<String> roles;

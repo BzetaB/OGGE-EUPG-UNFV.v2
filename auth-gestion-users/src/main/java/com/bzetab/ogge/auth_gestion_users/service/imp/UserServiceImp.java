@@ -6,6 +6,9 @@ import com.bzetab.ogge.auth_gestion_users.model.entities.Users;
 import com.bzetab.ogge.auth_gestion_users.repository.RoleRepository;
 import com.bzetab.ogge.auth_gestion_users.repository.UserRepository;
 import com.bzetab.ogge.auth_gestion_users.service.UserService;
+import com.bzetab.ogge.auth_gestion_users.utils.exception.custom.AlreadyExist;
+import com.bzetab.ogge.auth_gestion_users.utils.exception.custom.NotEmpty;
+import com.bzetab.ogge.auth_gestion_users.utils.exception.custom.NotFound;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,17 +33,17 @@ public class UserServiceImp implements UserService {
     @Override
     public Users createUser(String email, String password, List<String> roles) {
         if (userRepository.findUserByEmailUser(email).isPresent()) {
-            throw new RuntimeException("Email already exists");
+            throw new AlreadyExist("El correo ya se encuentra registrado");
         }
         if(password.isEmpty()){
-            throw new RuntimeException("Password is empty");
+            throw new NotEmpty("La contraseña no puede estar vacia");
         }
         if(roles.isEmpty()){
-            throw new RuntimeException("Roles is empty");
+            throw new NotEmpty("Se necesita asignarle un rol");
         }
         List<Role> rolesFound = roleRepository.findByNameRolIn(roles);
         if(rolesFound.isEmpty()){
-            throw new RuntimeException("Roles not found");
+            throw new NotFound("No se encontraron los roles");
         }
 
         String encondedPassword = passwordEncoder.encode(password);

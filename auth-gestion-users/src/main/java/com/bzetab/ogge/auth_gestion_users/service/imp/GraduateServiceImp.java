@@ -10,6 +10,8 @@ import com.bzetab.ogge.auth_gestion_users.repository.GraduateRepository;
 import com.bzetab.ogge.auth_gestion_users.service.GraduateService;
 import com.bzetab.ogge.auth_gestion_users.service.UserService;
 import com.bzetab.ogge.auth_gestion_users.utils.GeneralResponse;
+import com.bzetab.ogge.auth_gestion_users.utils.exception.custom.AlreadyExist;
+import com.bzetab.ogge.auth_gestion_users.utils.exception.custom.NotEmpty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,16 +33,16 @@ public class GraduateServiceImp  implements GraduateService {
     @Override
     public Graduate createEgresado(GraduateRegisterRequest request) {
         if(request.getDocumentNumber().isEmpty()){
-            throw new RuntimeException("El documento no puede estar vacio");
+            throw new NotEmpty("El documento no puede estar vacio");
         }
         if(graduateRepository.findGraduateByDocumentNumberGraduate(request.getDocumentNumber()).isPresent()){
-            throw new RuntimeException("El documento ya existe");
+            throw new AlreadyExist("El documento ya existe");
         }
         if(request.getCellphone().isEmpty()){
-            throw new RuntimeException("El cellphone no puede estar vacio");
+            throw new NotEmpty("El cellphone no puede estar vacio");
         }
         if(graduateRepository.findGraduateByCellphoneGraduate(request.getCellphone()).isPresent()){
-            throw new RuntimeException("El cellphone ya existe");
+            throw new AlreadyExist("El cellphone ya existe");
         }
         List<String> rol = List.of("EGRESADO");
         Users user = userService.createUser(request.getEmail(), request.getPassword(), rol);

@@ -3,6 +3,7 @@ package com.bzetab.ogge.auth_gestion_users.service.imp;
 import com.bzetab.ogge.auth_gestion_users.model.entities.UserRole;
 import com.bzetab.ogge.auth_gestion_users.model.entities.Users;
 import com.bzetab.ogge.auth_gestion_users.repository.UserRepository;
+import com.bzetab.ogge.auth_gestion_users.utils.exception.custom.NotFound;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -27,7 +28,7 @@ public class AuthDetailsServiceImp implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Users user = userRepository.findUserByEmailUser(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado" + email));
+                .orElseThrow(() -> new NotFound("Usuario no encontrado con el email: " + email));
 
         List<GrantedAuthority> authorities = user.getRole()
                 .stream()

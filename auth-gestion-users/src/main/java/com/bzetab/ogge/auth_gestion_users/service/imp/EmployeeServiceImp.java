@@ -9,6 +9,8 @@ import com.bzetab.ogge.auth_gestion_users.repository.EmployeeRepository;
 import com.bzetab.ogge.auth_gestion_users.service.EmployeeService;
 import com.bzetab.ogge.auth_gestion_users.service.UserService;
 import com.bzetab.ogge.auth_gestion_users.utils.GeneralResponse;
+import com.bzetab.ogge.auth_gestion_users.utils.exception.custom.AlreadyExist;
+import com.bzetab.ogge.auth_gestion_users.utils.exception.custom.NotEmpty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,16 +31,16 @@ public class EmployeeServiceImp implements EmployeeService {
     @Override
     public Employee createEmployee(EmployeeRegisterRequesst request) {
         if(request.getDocumentNumber().isEmpty()){
-            throw new RuntimeException("El documento no puede estar vacio");
+            throw new NotEmpty("El documento no puede estar vacio");
         }
         if(employeeRepository.findEmployeeByDocumentNumberEmployee(request.getDocumentNumber()).isPresent()){
-            throw new RuntimeException("El documento ya existe");
+            throw new AlreadyExist("El documento ya se encuentra registrado");
         }
         if(request.getCellphone().isEmpty()){
-            throw new RuntimeException("El cellphone no puede estar vacio");
+            throw new NotEmpty("El cellphone no puede estar vacio");
         }
         if(employeeRepository.findEmployeeByCellphoneEmployee(request.getCellphone()).isPresent()){
-            throw new RuntimeException("El cellphone ya existe");
+            throw new AlreadyExist("El cellphone ya se encuentra registrado");
         }
         List<String> rol = request.getRoles();
         Users users = userService.createUser(request.getEmail(), request.getPassword(), rol);
